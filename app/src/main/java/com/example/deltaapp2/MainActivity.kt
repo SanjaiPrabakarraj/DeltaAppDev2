@@ -1,11 +1,8 @@
 package com.example.deltaapp2
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.MotionEvent
-import androidx.annotation.ContentView
 import com.example.deltaapp2.databinding.ActivityMainBinding
 import kotlinx.coroutines.*
 
@@ -18,26 +15,37 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        startRepeatingJob (1000L)
-        update()
-    }
-
-    override fun onUserInteraction() {
-        update()
-        super.onUserInteraction()
+        binding.pong.GameThread().start()
+        startRepeatingJob (1L)
     }
 
     fun update(){
-        val sharedPref = getSharedPreferences("App_Info", Context.MODE_PRIVATE)
-        val high = sharedPref.getInt("High", 0)
-        var point = binding.pong.point
-        if (high <= point){
-            val editor = sharedPref.edit()
-            editor.clear()
-            editor.putInt("High", point)
-            editor.apply()
+        var point = binding.pong.playerPoint
+
+        if (binding.pong.diff == 0) {
+            val easyHighScore = getSharedPreferences("App_EasyMode", Context.MODE_PRIVATE)
+            val easyHigh = easyHighScore.getInt("easyHigh", 0)
+            if (easyHigh <= point) {
+                val editor = easyHighScore.edit()
+                editor.clear()
+                editor.putInt("easyHigh", point)
+                editor.apply()
+            }
+            binding.pong.high = easyHigh
         }
-        binding.pong.high = high
+
+        else if(binding.pong.diff == 1)
+        {
+            val hardHighScore = getSharedPreferences("App_HardMode", Context.MODE_PRIVATE)
+            val hardHigh = hardHighScore.getInt("hardHigh", 0)
+            if (hardHigh <= point) {
+                val editor = hardHighScore.edit()
+                editor.clear()
+                editor.putInt("hardHigh", point)
+                editor.apply()
+            }
+            binding.pong.high = hardHigh
+        }
     }
 
     private fun startRepeatingJob(timeInterval: Long): Job {
@@ -48,5 +56,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        binding.pong.stopGame()
+    }
+
 
 }
