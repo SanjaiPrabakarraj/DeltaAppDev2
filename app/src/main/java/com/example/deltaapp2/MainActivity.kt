@@ -19,32 +19,73 @@ class MainActivity : AppCompatActivity() {
         startRepeatingJob (1L)
     }
 
-    fun update(){
-        var point = binding.pong.playerPoint
+    private fun update(){
+        val practicePoint = binding.pong.practicePoint
+        val playerPoint = binding.pong.playerPoint
+        val computerPoint = binding.pong.computerPoint
 
         if (binding.pong.diff == 0) {
-            val easyHighScore = getSharedPreferences("App_EasyMode", Context.MODE_PRIVATE)
+            val easyHighScore = getSharedPreferences("Practice_EasyMode", Context.MODE_PRIVATE)
             val easyHigh = easyHighScore.getInt("easyHigh", 0)
-            if (easyHigh <= point) {
+            if (easyHigh <= practicePoint) {
                 val editor = easyHighScore.edit()
                 editor.clear()
-                editor.putInt("easyHigh", point)
+                editor.putInt("easyHigh", practicePoint)
                 editor.apply()
             }
-            binding.pong.high = easyHigh
+            binding.pong.practiceHigh = easyHigh
         }
-
-        else if(binding.pong.diff == 1)
-        {
-            val hardHighScore = getSharedPreferences("App_HardMode", Context.MODE_PRIVATE)
+        else if(binding.pong.diff == 1) {
+            val hardHighScore = getSharedPreferences("Practice_HardMode", Context.MODE_PRIVATE)
             val hardHigh = hardHighScore.getInt("hardHigh", 0)
-            if (hardHigh <= point) {
+            if (hardHigh <= practicePoint) {
                 val editor = hardHighScore.edit()
                 editor.clear()
-                editor.putInt("hardHigh", point)
+                editor.putInt("hardHigh", practicePoint)
                 editor.apply()
             }
-            binding.pong.high = hardHigh
+            binding.pong.practiceHigh = hardHigh
+        }
+
+        if ((binding.pong.diff == 0) and (binding.pong.mode == 2)) {
+            val computerEasyHighScore = getSharedPreferences("Computer_EasyMode", Context.MODE_PRIVATE)
+            val playerEasyHighScore = getSharedPreferences("Player_EasyMode", Context.MODE_PRIVATE)
+            val computerEasy = computerEasyHighScore.getInt("computerHigh", 0)
+            val playerEasy = playerEasyHighScore.getInt("playerHigh", 0)
+            if (playerEasy <= playerPoint) {
+                val editor = playerEasyHighScore.edit()
+                editor.clear()
+                editor.putInt("playerHigh", playerPoint)
+                editor.apply()
+            }
+            if (computerEasy <= computerPoint) {
+                val editor = computerEasyHighScore.edit()
+                editor.clear()
+                editor.putInt("computerHigh", computerPoint)
+                editor.apply()
+            }
+            binding.pong.playerHigh = playerEasy
+            binding.pong.computerHigh = computerEasy
+        }
+        else if ((binding.pong.diff == 1) and (binding.pong.mode == 2)) {
+            val computerHardHighScore = getSharedPreferences("Computer_HardMode", Context.MODE_PRIVATE)
+            val playerHardHighScore = getSharedPreferences("Player_HardMode", Context.MODE_PRIVATE)
+            val computerHard = computerHardHighScore.getInt("computerHigh", 0)
+            val playerHard = playerHardHighScore.getInt("playerHigh", 0)
+            if (playerHard <= playerPoint) {
+                val editor = playerHardHighScore.edit()
+                editor.clear()
+                editor.putInt("playerHigh", playerPoint)
+                editor.apply()
+            }
+            if (computerHard <= computerPoint) {
+                val editor = computerHardHighScore.edit()
+                editor.clear()
+                editor.putInt("computerHigh", computerPoint)
+                editor.apply()
+            }
+            binding.pong.playerHigh = playerHard
+            binding.pong.computerHigh = computerHard
         }
     }
 
@@ -60,6 +101,15 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         super.onBackPressed()
         binding.pong.stopGame()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if ((binding.pong.gameAI) or (binding.pong.gamePRACTICE))
+            if (!binding.pong.gamePAUSED)
+                binding.pong.pauseGame()
+            binding.pong.resumeGame()
+            binding.pong.pauseGame()
     }
 
 
