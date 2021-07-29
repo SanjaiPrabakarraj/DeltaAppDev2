@@ -298,7 +298,7 @@ class GameView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                             slowBallFlag = true
                             dX /= 1.5f
                             dY /= 1.5f
-                            slowBallScore = playerPoint
+                            slowBallScore = if (mode == 2) playerPoint else practicePoint
                         }
                     }
                     if ((touchX in ((width - 210f) - paddleLength)..((width - 210f) + paddleLength)) and
@@ -310,7 +310,7 @@ class GameView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                             paddleLength = 0f
                             paddleLengthFlag = true
                             playerWIDTH = 280
-                            paddleLengthScore = playerPoint
+                            paddleLengthScore = if (mode == 2) playerPoint else practicePoint
                         }
                     }
 
@@ -368,7 +368,7 @@ class GameView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         gameMAINMENU = false
         gamePRACTICE = true
         gameOVER = false
-        playerPoint = 0
+        resetGame()
         playerX = (width / 2 - playerWIDTH / 2).toFloat()
         GameThread().start()
     }
@@ -396,12 +396,15 @@ class GameView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         dX *= 5f
         dY = 5f
         playerWIDTH = 180
+        computerWIDTH = 180
+        playerPoint = 0
+        computerPoint = 0
+        practicePoint = 0
     }
 
     private fun returnMenu()
     {
-        playerPoint = 0
-        computerPoint = 0
+        resetGame()
         gameMAINMENU = true
         gameOVER = false
         invalidate()
@@ -413,8 +416,7 @@ class GameView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         gameAI = true
         gameOVER = false
         gamePRACTICE = false
-        playerPoint = 0
-        computerPoint = 0
+        resetGame()
         playerX = (width / 2 - playerWIDTH / 2).toFloat()
         GameThread().start()
     }
@@ -616,22 +618,16 @@ class GameView(context: Context, attrs: AttributeSet) : View(context, attrs) {
                 if (!gamePAUSED) {
                     if ((paddleLength < 30) and (!paddleLengthFlag))
                         paddleLength += 0.03f
-                    else if ((paddleLengthFlag) and (playerPoint == paddleLengthScore + 3)) {
+                    else if ((paddleLengthFlag) and (practicePoint == paddleLengthScore + 3)) {
                         playerWIDTH = 180
                         paddleLengthFlag = false
                     }
                     if ((slowBall < 30) and (!slowBallFlag))
                         slowBall += 0.03f
-                    else if ((slowBallFlag) and (playerPoint == slowBallScore + 3)) {
+                    else if ((slowBallFlag) and (practicePoint == slowBallScore + 3)) {
                         dX *= 2
                         dY *= 2
                         slowBallFlag = false
-                    }
-                    if ((computerPaddle < 30) and (!computerPaddleFlag))
-                        computerPaddle += 0.03f
-                    else if ((computerPaddleFlag) and (playerPoint == computerPaddleScore + 3)) {
-                        computerWIDTH = 180
-                        computerPaddleFlag = false
                     }
                 }
                 postInvalidate()
